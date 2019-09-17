@@ -3,6 +3,11 @@ import { LoginForm } from './LoginForm';
 import { Account } from './Account';
 import './App.css';
 import { AuthenticationStatus } from 'bitski';
+import {providers} from "ethers"
+import { getPayload } from './hash';
+import {TypedDataUtils} from "eth-sig-util"
+import { recoverAddress } from 'ethers/utils';
+
 
 class ErrorMessage extends React.Component {
   render() {
@@ -12,6 +17,8 @@ class ErrorMessage extends React.Component {
     );
   }
 }
+
+let provider;
 
 export default class App extends React.Component {
   constructor(props) {
@@ -33,6 +40,8 @@ export default class App extends React.Component {
 
     this.loadAccounts();
     this.loadUser();
+
+    provider = new providers.Web3Provider(this.props.web3.currentProvider)
   }
 
   loadAccounts() {
@@ -54,6 +63,25 @@ export default class App extends React.Component {
         console.error(error);
       });
     }
+  }
+
+  signPayloadBitski() {
+    // const bitskiEthersWeb3Provider = new providers.Web3Provider(this.props.web3.currentProvider)
+    console.log(provider)
+    const bitskiSigner = provider.getSigner();
+    bitskiSigner.getAddress().then(address => {
+      console.log(`Signing EIP712 payload`);
+      const payload = getPayload()
+      const digest = TypedDataUtils.sign(payload);
+      console.log(`Bitski payload to sign: ${payload}`);
+      bitskiSigner.provider
+      .send("eth_signTypedData", [address.toLowerCase(), payload])
+      .then(signature => {
+        console.log(`Bitski signature: ${signature}`);
+        const recoveredAddress = recoverAddress(digest, signature)
+        console.log(`Recovered address: ${recoveredAddress}`)
+        });
+    });
   }
 
   loadUser() {
@@ -87,7 +115,7 @@ export default class App extends React.Component {
     let main;
 
     if (this.state.loggedIn) {
-      main = <Account account={this.state.account} user={this.state.user} balance={this.state.balance} onSignOut={this.signOut} web3={this.props.web3} />;
+      main = <Account account={this.state.account} user={this.state.user} balance={this.state.balance} onSignOut={this.signOut} sign ={this.signPayloadBitski} web3={this.props.web3} />;
     } else {
       main = <LoginForm onSignIn={this.signIn} />;
     }

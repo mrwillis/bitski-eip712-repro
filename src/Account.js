@@ -29,11 +29,16 @@ export class Account extends React.Component {
   constructor(props) {
     super(props);
     this.handleLogOut = this.handleLogOut.bind(this);
+    this.handleSign = this.handleSign.bind(this)
     this.state = {};
   }
 
   handleLogOut() {
     this.props.onSignOut();
+  }
+
+  handleSign() {
+    this.props.sign()
   }
 
   render() {
@@ -48,6 +53,9 @@ export class Account extends React.Component {
         <Address account={this.props.account} />
         <div className="Account-logout small">
           Logged in as {this.props.user.id}. <button className="btn btn-link btn-sm d-inline p-0 align-baseline" onClick={this.handleLogOut}>Log Out</button>
+        </div>
+        <div className="Account-logout small">
+          <button className="btn btn-link btn-sm d-inline p-0 align-baseline" onClick={this.handleSign}>EIP712 Sign</button>
         </div>
       </div>
     );

@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "bitski": "^0.10.4",
+    "eth-sig-util": "^2.4.4",
+    "ethers": "^4.0.37",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1",
-    "bitski": "^0.9.0",
     "web3": "1.2.0"
   },
   "scripts": {
